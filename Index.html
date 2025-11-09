@@ -3,15 +3,101 @@
         <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link rel="stylesheet" type="text/css" href="Styles.css">
                 <link rel="icon" type="image/png" href="PlasmaPuffs.png">
-                <script src="Script.js" defer></script>
                 <title>PlasmaPuffs</title>
                 <style>
+                        @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
                         html, body {
                                 margin: 0;
+                                padding: 0;
+                                width: 100%;
                                 height: 100%;
+                                overflow: hidden;
                                 background-color: #222222;
+                        }
+
+                        :root {
+                                --foreground-color: rgba(255, 255, 255, 0.87);
+                        }
+
+                        * {
+                                color: var(--foreground-color);
+                                font-family: "Inter", sans-serif;
+                                box-sizing: border-box;
+                        }
+
+                        .emoji {
+                                width: 1em;
+                                height: 1em;
+                                vertical-align: -0.2em;
+                        }
+
+                        .wrapper {
+                                width: 100%;
+                                height: 100%;
+                                overflow-y: auto;
+                                background-color: #222222;
+                                padding: 2rem;
+                        }
+
+                        .header {
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 4rem;
+                                position: sticky;
+                                border-radius: 0.5rem;
+                                background-color: #333333;
+                                border-bottom: 0.25rem solid #555555;
+                                list-style: none;
+                                align-items: center;
+                                display: flex;
+                                padding-left: 2rem;
+                                padding-right: 2rem;
+                                padding-top: 1rem;
+                                padding-bottom: 1rem;
+                                gap: 2rem;
+                        }
+
+                        .header li {
+                                display: flex;
+                                align-items: center;
+                                min-width: 2rem;
+                                max-width: 10rem;
+                                height: 100%;
+                        }
+
+                        .header li a {
+                                width: 100%;
+                                display: flex;
+                                align-items: center;
+                                text-decoration: none;
+                                transition: border-bottom 100ms ease-out;
+                                border-bottom: 0.15rem solid transparent;
+                                font-size: larger;
+                                padding: 0.25rem;
+                                gap: 0.5rem;
+                        }
+
+                        .header li:hover a {
+                                border-bottom: 0.15rem solid var(--foreground-color);
+                        }
+
+                        .header li a span {
+                                width: calc(100%);
+                                white-space: nowrap;
+                                display: inline-block;
+                                text-overflow: ellipsis;
+                                overflow: hidden;
+                        }
+
+                        main {
+                                width: 100%;
+                                padding-left: 2rem;
+                                padding-right: 2rem;
+                                padding-bottom: 2rem;
+                                padding-top: 1rem;
                         }
                 </style>
         </head>
@@ -35,4 +121,108 @@
                         </main>
                 </div>
         </body>
+        <script>
+                const searchParameters = new URLSearchParams(window.location.search);
+                if (searchParameters.has("redirect")) {
+                        const redirectPath = searchParameters.get("redirect");
+                        history.replaceState({}, "", redirectPath);
+                }
+
+                const deepFreeze = object => {
+                        if (object === undefined) {
+                                return object;
+                        }
+
+                        Object.freeze(object);
+
+                        for (const property of Object.getOwnPropertyNames(object)) {
+                                const value = object[property];
+
+                                if (value === undefined) {
+                                        return;
+                                }
+
+                                const type = typeof value;
+                                if (type === "object" || type === "function") {
+                                        if (!Object.isFrozen(value)) {
+                                                deepFreeze(value);
+                                        }
+                                }
+                        }
+
+                        return object;
+                };
+
+                const pages = deepFreeze({
+                        "/home": "Home.html",
+                        "/sokobee": "Sokobee.js"
+                });
+
+                const content = document.getElementById("content");
+                const fallbackPage = () => {
+                        // This could be an error while loading the page, or the page being not found (404)
+                        // Maybe add more information for the type of error and/or use <template>s in <main>
+                        content.innerHTML = "<h1>Error loading page</h1>";
+                };
+
+                const updatePage = async path => {
+                        const page = pages[path];
+                        if (page === undefined) {
+                                fallbackPage();
+                                return;
+                        }
+
+                        try {
+                                const response = await fetch(page);
+                                if (!response.ok) {
+                                        console.error(`Failed to load page ${url}: ${response.status} ${response.statusText}`);
+                                        fallbackPage();
+                                        return;
+                                }
+
+                                content.innerHTML = await response.text();
+
+                                // Scripts added directly to the HTML as strings don't get executed so I
+                                // need to replace them my themselves manually to execute each script.
+                                const scripts = container.querySelectorAll("script");
+                                for (const script of scripts) {
+                                        const newScript = document.createElement("script");
+
+                                        if (script.textContent) {
+                                                newScript.textContent = script.textContent;
+                                        }
+
+                                        for (const attr of script.attributes) {
+                                                newScript.setAttribute(attr.name, attr.value);
+                                        }
+
+                                        script.parentNode.replaceChild(newScript, script);
+                                }
+                        } catch (error) {
+                                console.error(`Navigation error: ${error}`);
+                                fallbackPage();
+                                return;
+                        }
+                };
+
+                document.querySelectorAll("a.navigation-link").forEach(link => {
+                        link.addEventListener("click", event => {
+                                event.preventDefault();
+
+                                const path = link.getAttribute("href");
+                                history.pushState({}, "", path);
+                                updatePage(path);
+                        });
+                });
+
+                window.addEventListener("popstate", () => {
+                        updatePage(window.location.pathname);
+                });
+
+                if (window.location.pathname === "/") {
+                        history.replaceState({}, "", "/home");
+                }
+
+                updatePage(window.location.pathname);
+        </script>
 </html>
