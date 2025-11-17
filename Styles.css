@@ -254,7 +254,7 @@ main > section {
         object-fit: contain;
 }
 
-.void-actions {
+.horizontal-buttons {
         display: flex;
         gap: 1rem;
 }

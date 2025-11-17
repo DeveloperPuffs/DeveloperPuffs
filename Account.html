@@ -1,33 +1,48 @@
-<section id="account-details-section" hidden>
-        <img id="avatar-image" src="Assets/Icons/PlasmaPuffs.png" width="256" height="256" alt=""/>
+<section id="profile-section" hidden>
+        <img id="profile-picture" src="Assets/Icons/PlasmaPuffs.png" width="256" height="256" alt="Profile Picture"/>
         <h2 id="username-field">Username</h2>
         <p id="email-field">email@example.com</p>
-        <div class="account-information">
-                <p>
-                        <b>Email Status:</b>
-                        <code id="email-status-field">Verified</code>
-                </p>
-                <p>
-                        <b>Member Since:</b>
-                        <code id="member-since-field">Jan 3, 2025</code>
-                </p>
-                <p>
-                        <b>Last Login:</b>
-                        <code id="last-login-field">Today</code>
-                </p>
-        </div>
+        <p>
+                <b>Email Status:</b>
+                <code id="email-status-field">Verified</code>
+        </p>
+        <p>
+                <b>Member Since:</b>
+                <code id="member-since-field">Jan 3, 2025</code>
+        </p>
+        <p>
+                <b>Last Login:</b>
+                <code id="last-login-field">Today</code>
+        </p>
         <button id="sign-out-button">Sign Out</button>
+</section>
+<section id="profile-setup-section" hidden>
+        <h1>Create Your Profile</h1>
+        <label for="username-input"><b>Username:</b></label>
+        <br>
+        <input id="username-input" name="username" type="text" placeholder="Choose a username">
+        <br>
+        <br>
+        <button id="create-profile-button">Create Profile</button>
+</section>
+<section id="profile-error-section" hidden>
+        <h1>Failed to load Profile<h1>
+        <p>There was a problem connecting to the server, please try again.</p>
+        <div class="horizontal-buttons">
+                <button id="retry-load-button">Retry</button>
+                <a href="/" class="button" data-navigation-link>Return Home</a>
+        </div>
 </section>
 <section id="sign-in-section" hidden>
         <h1>Sign In</h1>
-        <label for="sign-in-email"><b>Email:</b></label>
+        <label for="sign-in-email-input"><b>Email:</b></label>
         <br>
-        <input id="sign-in-email" name="email" type="email" placeholder="Email">
+        <input id="sign-in-email-input" name="email" type="email" placeholder="Email">
         <br>
         <br>
-        <label for="sign-in-password"><b>Password:</b></label>
+        <label for="sign-in-password-input"><b>Password:</b></label>
         <br>
-        <input id="sign-in-password" name="password" type="password" placeholder="Password">
+        <input id="sign-in-password-input" name="password" type="password" placeholder="Password">
         <br>
         <br>
         <button id="sign-in-button">Sign In</button>
@@ -38,14 +53,14 @@
 </section>
 <section id="sign-up-section" hidden>
         <h1>Sign Up</h1>
-        <label for="sign-up-email"><b>Email:</b></label>
+        <label for="sign-up-email-input"><b>Email:</b></label>
         <br>
-        <input id="sign-up-email" name="email" type="email" placeholder="Email">
+        <input id="sign-up-email-input" name="email" type="email" placeholder="Email">
         <br>
         <br>
-        <label for="sign-up-email"><b>Password:</b></label>
+        <label for="sign-up-password-input"><b>Password:</b></label>
         <br>
-        <input id="sign-up-password" name="password" type="password" placeholder="Password">
+        <input id="sign-up-password-input" name="password" type="password" placeholder="Password">
         <br>
         <br>
         <button id="sign-up-button">Sign Up</button>

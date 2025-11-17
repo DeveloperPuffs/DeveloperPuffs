@@ -1,95 +1,144 @@
 "use strict";
 
-import * as Authentication from "./Authentication.js";
+import * as Backend from "./Backend.js";
 import * as Router from "./Router.js";
 import { DOM } from "./Elements.js";
 
-let accountPageActive = false;
-
 function displaySection(section) {
-        DOM.page.account.details.section.hidden = true;
+        DOM.page.account.profile.section.hidden = true;
+        DOM.page.account.profileSetup.section.hidden = true;
+        DOM.page.account.profileError.section.hidden = true;
         DOM.page.account.signIn.section.hidden = true;
         DOM.page.account.signUp.section.hidden = true;
         section.hidden = false;
 };
 
-function populateAccountDetails(user) {
-        DOM.page.account.details.usernameField.textContent =
-                user.user_metadata.username || "[No Username]";
-        DOM.page.account.details.emailField.textContent = user.email;
-        DOM.page.account.details.emailStatusField.textContent =
-                user.email_confirmed_at ? "Verified" : "Pending";
-        DOM.page.account.details.memberSinceField.textContent =
-                new Date(user.created_at).toLocaleString();
-        DOM.page.account.details.lastLoginField.textContent =
-                new Date(user.last_sign_in_at).toLocaleString();
+function populateProfileDetails() {
+        const account = Backend.getCurrentAccount();
+        // get profile too
+
+        DOM.page.account.profile.usernameField.textContent = account.user_metadata.username || "[No Username]";
+        DOM.page.account.profile.emailField.textContent = account.email;
+        DOM.page.account.profile.emailStatusField.textContent = account.email_confirmed_at ? "Verified" : "Pending";
+        DOM.page.account.profile.memberSinceField.textContent = new Date(account.created_at).toLocaleString();
+        DOM.page.account.profile.lastLoginField.textContent = new Date(account.last_sign_in_at).toLocaleString();
+}
+
+async function backendEventCallback(event) {
+        if (event === Backend.Event.SIGNED_IN) {
+                const profile = Backend.getAccountProfile();
+                if (profile === null) {
+                        displaySection(DOM.page.account.profileSetup.section);
+                        return;
+                }
+
+                if (profile === Backend.PROFILE_LOAD_ERROR) {
+                        displaySection(DOM.page.account.profileError.section);
+                        return;
+                }
+
+                displaySection(DOM.page.account.details.section);
+                populateProfileDetails();
+                return;
+        }
+
+        if (event === Backend.Event.SIGNED_OUT) {
+                await Router.loadPage(Router.pages.home);
+                alert("You are now signed out.");
+                return;
+        }
+}
+
+function setupPageElements() {
+        DOM.page.account.profileError.retryLoadButton.addEventListener("click", async () => {
+                // TODO: Retry
+        });
+
+        DOM.page.account.details.signOutButton.addEventListener("click", async () => {
+                await Backend.signOut();
+        });
+
+        DOM.page.account.signIn.signInButton.addEventListener("click", async () => {
+                const email = DOM.page.account.signIn.emailInput.value;
+                const password = DOM.page.account.signIn.passwordInput.value;
+                if (!(await Backend.signIn(email, password))) {
+                        // Show a messsage saying that the sign in failed 
+                }
+        });
+
+        DOM.page.account.signIn.signUpLink.addEventListener("click", () => {
+                displaySection(DOM.page.account.signUp.section);
+        });
+
+        DOM.page.account.signUp.signUpButton.addEventListener("click", async () => {
+                const email = DOM.page.account.signUp.emailInput.value;
+                const password = DOM.page.account.signUp.passwordInput.value;
+                if (!(await Backend.signUp(email, password))) {
+                        // Show a message saying that the sign up failed
+                }
+        });
+
+        DOM.page.account.signUp.signInLink.addEventListener("click", () => {
+                displaySection(DOM.page.account.signIn.section);
+        });
 }
 
 export function setup() {
-        Authentication.onAuthenticationStateChange(async user => {
+        /*
+        Backend.onAuthenticationStateChange(async (account, profile) => {
                 if (!accountPageActive) {
                         return;
                 }
 
-                if (user === null) {
+                if (account === null) {
                         await Router.loadPage(Router.pages.home);
                         alert("You are now signed out.");
                         return;
                 }
 
-                displaySection(DOM.page.account.details.section);
-                populateAccountDetails(user);
+                if (profile === null) {
+                        displaySection(DOM.page.account.profileSetup.section);
+                        return;
+                }
+
+                if (profile === Backend.PROFILE_LOAD_ERROR) {
+                        displaySection(DOM.page.account.profileError.section);
+                        return;
+                }
+
+                displaySection(DOM.page.account.profile.section);
+                populateProfileDetails(account, profile);
         });
+        */
 
         Router.onPageLoad(page => {
                 if (page !== Router.pages.account) {
-                        accountPageActive = false;
+                        Backend.removeCallback(backendEventCallback);
                         return;
                 }
 
-                accountPageActive = true;
+                Backend.registerCallback(backendEventCallback);
 
-                DOM.page.account.details.signOutButton.addEventListener("click", async () => {
-                        await Authentication.signOut();
-                });
+                setupPageElements();
 
-                DOM.page.account.signIn.signInButton.addEventListener("click", async () => {
-                        try {
-                                await Authentication.signIn(
-                                        DOM.page.account.signIn.emailInput.value,
-                                        DOM.page.account.signIn.passwordInput.value
-                                );
-                        } catch (error) {
-                                alert(`Authentication error ${error.status}: ${error.message}`);
-                        }
-                });
-
-                DOM.page.account.signIn.signUpLink.addEventListener("click", () => {
-                        displaySection(DOM.page.account.signUp.section);
-                });
-
-                DOM.page.account.signUp.signUpButton.addEventListener("click", async () => {
-                        try {
-                                await Authentication.signUp(
-                                        DOM.page.account.signUp.emailInput.value,
-                                        DOM.page.account.signUp.passwordInput.value
-                                );
-                        } catch (error) {
-                                alert(`Authentication error ${error.status}: ${error.message}`);
-                        }
-                });
-
-                DOM.page.account.signUp.signInLink.addEventListener("click", () => {
+                const account = Backend.getCurrentAccount();
+                if (account === null) {
                         displaySection(DOM.page.account.signIn.section);
-                });
+                        return;
+                }
 
-                const currentUser = Authentication.getCurrentUser();
-                if (currentUser === null) {
-                        displaySection(DOM.page.account.signIn.section);
+                const profile = Backend.getAccountProfile();
+                if (profile === null) {
+                        displaySection(DOM.page.account.profileSetup.section);
+                        return;
+                }
+
+                if (profile === Backend.PROFILE_LOAD_ERROR) {
+                        displaySection(DOM.page.account.profileError.section);
                         return;
                 }
 
                 displaySection(DOM.page.account.details.section);
-                populateAccountDetails(currentUser);
+                populateProfileDetails();
         });
 }

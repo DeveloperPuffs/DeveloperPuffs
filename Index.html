@@ -18,9 +18,9 @@
                                 <a href="/sokobee" data-navigation-link>Sokobee</a>
                                 <a href="/nowhere" data-navigation-link>Nowhere</a>
                         </nav>
-                        <a href="/account" class="icon" data-navigation-link>
+                        <a href="/account" class="icon" data-navigation-link="">
+                                <img id="profile-icon" alt="Profile Picture" class="undraggable image" hidden></img>
                                 <span id="default-icon" class="material-icons undraggable image">account_circle</span>
-                                <img id="account-icon" alt="User Account Profile Picture" class="undraggable image" hidden></img>
                         </a>
                 </header>
                 <main id="content">
@@ -49,14 +49,19 @@
                                 <p>The page couldn't be loaded.</p>
                                 <details>
                                         <summary>Show Details</summary>
-                                        <p class="secondary-text"><small>Requested path: <code id="void-path"></code></small></p>
-                                        <pre id="void-details"><pre>
+                                        <p class="secondary-text">
+                                                <small>
+                                                        Requested path:
+                                                        <code id="void-path-field"></code>
+                                                </small>
+                                        </p>
+                                        <pre id="void-details-field"><pre>
                                 </details>
                                 <br>
                                 <br>
-                                <div class="void-actions">
-                                        <button onclick="loadPage()">Retry</button>
-                                        <a href="/" class="button" data-navigation-link="">Return Home</a>
+                                <div class="horizontal-buttons">
+                                        <button id="void-retry-button">Retry</button>
+                                        <a href="/" class="button" data-navigation-link>Return Home</a>
                                 </div>
                         </section>
                 </main>

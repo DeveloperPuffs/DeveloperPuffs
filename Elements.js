@@ -42,23 +42,24 @@ function applyElementGetters(object) {
 
 export const DOM = {
         header: {
-                defaultIcon: "#default-icon",
-                accountIcon: "#account-icon"
+                profileIcon: "#profile-icon",
+                defaultIcon: "#default-icon"
         },
         home: {
                 section: "#home-section",
         },
         void: {
                 section: "#void-section",
-                pathField: "#void-path",
-                detailsField: "#void-details"
+                pathField: "#void-path-field",
+                detailsField: "#void-details-field",
+                retryButton: "#void-retry-button"
         },
         page: {
                 section: "#page-section",
                 account: {
-                        details: {
-                                section: "#account-details-section",
-                                avatarImage: "#avatar-image",
+                        profile: {
+                                section: "#profile-section",
+                                profilePicture: "#profile-picture",
                                 usernameField: "#username-field",
                                 emailField: "#email-field",
                                 emailStatusField: "#email-status-field",
@@ -66,17 +67,26 @@ export const DOM = {
                                 lastLoginField: "#last-login-field",
                                 signOutButton: "#sign-out-button"
                         },
+                        profileSetup: {
+                                section: "#profile-setup-section",
+                                usernameInput: "#username-input",
+                                createProfileButton: "#create-profile-button"
+                        },
+                        profileError: {
+                                section: "#profile-error-section",
+                                retryLoadButton: "retry-load-button"
+                        },
                         signIn: {
                                 section: "#sign-in-section",
-                                emailInput: "#sign-in-email",
-                                passwordInput: "#sign-in-password",
+                                emailInput: "#sign-in-email-input",
+                                passwordInput: "#sign-in-password-input",
                                 signInButton: "#sign-in-button",
                                 signUpLink: "#sign-up-link"
                         },
                         signUp: {
                                 section: "#sign-up-section",
-                                emailInput: "#sign-up-email",
-                                passwordInput: "#sign-up-password",
+                                emailInput: "#sign-up-email-input",
+                                passwordInput: "#sign-up-password-input",
                                 signUpButton: "#sign-up-button",
                                 signInLink: "#sign-in-link"
                         }
